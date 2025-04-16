@@ -6,7 +6,6 @@ metadata:
   annotations:
     description: StackStorm st2auth - all authentication is managed by this service.
     {{- if .Values.st2auth.service.hostname }}
-    external-dns.alpha.kubernetes.io/hostname: {{ .Values.st2auth.service.hostname | quote }}
     {{- end }}
     {{- if .Values.st2auth.service.annotations }}
       {{- toYaml .Values.st2auth.service.annotations | nindent 4 }}
@@ -31,9 +30,6 @@ metadata:
   name: {{ .Release.Name }}-st2api
   annotations:
     description: StackStorm st2api - service hosts the REST API endpoints that serve requests from WebUI, CLI, ChatOps and other st2 services.
-    {{- if .Values.st2api.service.hostname }}
-    external-dns.alpha.kubernetes.io/hostname: {{ .Values.st2api.service.hostname | quote }}
-    {{- end }}
     {{- if .Values.st2api.service.annotations }}
       {{- toYaml .Values.st2api.service.annotations | nindent 4 }}
     {{- end }}
@@ -57,9 +53,6 @@ metadata:
   name: {{ .Release.Name }}-st2stream
   annotations:
     description: StackStorm st2stream - exposes a server-sent event stream, used by the clients like WebUI and ChatOps to receive update from the st2stream server.
-    {{- if .Values.st2stream.service.hostname }}
-    external-dns.alpha.kubernetes.io/hostname: {{ .Values.st2stream.service.hostname | quote }}
-    {{- end }}
     {{- if .Values.st2stream.service.annotations }}
       {{- toYaml .Values.st2stream.service.annotations | nindent 4 }}
     {{- end }}
@@ -83,9 +76,6 @@ metadata:
   name: {{ .Release.Name }}-st2web
   annotations:
     description: StackStorm st2web, - an admin Web UI and main entry point for external API requests
-    {{- if .Values.st2web.service.hostname }}
-    external-dns.alpha.kubernetes.io/hostname: {{ .Values.st2web.service.hostname | quote }}
-    {{- end }}
     {{- if .Values.st2web.service.annotations }}
       {{- toYaml .Values.st2web.service.annotations | nindent 4 }}
     {{- end }}

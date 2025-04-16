@@ -50,7 +50,7 @@ serviceAccount:
   # Used to define service account annotations
   serviceAccountAnnotations: {}
   # Used to override service account name
-  serviceAccountName:
+  serviceAccountName: stackstorm
   # Used to define any custom labels required
   #serviceAccountLabels: {}
 
@@ -304,31 +304,6 @@ podSecurityContext: {}
 securityContext: {}
 
 ##
-## StackStorm HA Ingress
-##
-ingress:
-  # As recommended, ingress is disabled by default.
-  enabled: false
-  # Annotations are used to configure the ingress controller
-  annotations: {}
-    # kubernetes.io/ingress.class: nginx
-    # kubernetes.io/tls-acme: "true"
-  # Map hosts to paths
-  hosts: []
-  # - host: hostname.domain.tld
-  #   # Map paths to services
-  #   paths:
-  #     - path: /
-  #       serviceName: service
-  #       servicePort: port
-  # Secure the Ingress by specifying a secret that contains a TLS private key and certificate
-  tls: []
-  # - secretName: chart-example-tls
-  #   hosts:
-  #     - chart-example.test
-  # ingressClassName: nginx-ingress
-
-##
 ## NOTE: there used to be a secrets.st2 section here. These values have moved into st2.* above. Please update your values.
 ##
 
@@ -356,7 +331,7 @@ st2web:
   # ingress:
   service:
     # type can be one of "ClusterIP", "NodePort", "LoadBalancer" or "ExternalName"
-    type: "NodePort"
+    type: "ClusterIP"
     # The hostname associated with st2web service (externalName, added to external DNS, etc.)
     hostname: ""
     # For more information regarding annotations, see
@@ -1164,19 +1139,3 @@ dnsConfig: {}
   #- name: ndots
   #  value: "2"
   #- name: edns0
-
-##
-## External DNS configuration (3rd party chart dependency)
-##
-## Creates a deployment of external-dns within the cluster to update DNS with CNAME -> ELB
-##
-## For values.yaml reference:
-## https://github.com/bitnami/charts/tree/master/bitnami/external-dns
-##
-## TODO: If eq st2web.service.type "LoadBalancer", set enabled to true. Any other cases?
-external-dns:
-  enabled: false
-  provider: aws
-  aws:
-    zoneType: "public"
-  domainFilters: []
