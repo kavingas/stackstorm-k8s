@@ -1018,7 +1018,7 @@ mongodb:
   replicaSetName: rs0
   # Number of MongoDB replicas to deploy.
   # Ignored when mongodb.architecture=standalone
-  replicaCount: 3
+  replicaCount: 1
   auth:
     enabled: true
     # NB! It's highly recommended to change ALL insecure auth defaults!
@@ -1080,7 +1080,7 @@ rabbitmq:
   # rabbitmqMemoryHighWatermark = 0.4 * resources.limits.memory
   resources: {}
   # number of replicas in the rabbit cluster
-  replicaCount: 3
+  replicaCount: 1
   # As RabbitMQ enabled prometheus operator monitoring by default, disable it for non-prometheus users
   metrics:
     enabled: false
@@ -1098,7 +1098,7 @@ redis:
   # By default the cluster is enabled for the subchart.
   # We just need replica count here to ensure it is HA
   cluster:
-    slaveCount: 3
+    slaveCount: 1
   # Sentinel settings. Sentinel is enabled for better resiliency.
   # This is highly recommended as per tooz library documentation.
   # Hence, the chart requires the setting.
