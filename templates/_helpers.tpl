@@ -281,6 +281,8 @@ For custom st2packs-Container reduce duplicity by defining it here once
   emptyDir: {}
 - name: st2-virtualenvs-vol
   emptyDir: {}
+- name: st2-pack-configs-vol
+  emptyDir: {}
   {{- end }}
 {{- end -}}
 {{- define "stackstorm-ha.packs-volume-mounts" -}}
@@ -297,6 +299,9 @@ For custom st2packs-Container reduce duplicity by defining it here once
   readOnly: true
 - name: st2-virtualenvs-vol
   mountPath: /opt/stackstorm/virtualenvs
+  readOnly: true
+- name: st2-pack-configs-vol
+  mountPath: /opt/stackstorm/configs
   readOnly: true
   {{- end }}
 {{- end -}}
@@ -346,12 +351,15 @@ Merge packs and virtualenvs from st2 with those from st2packs images
     mountPath: /opt/stackstorm/packs-shared
   - name: st2-virtualenvs-vol
     mountPath: /opt/stackstorm/virtualenvs-shared
+  - name: st2-pack-configs-vol
+    mountPath: /opt/stackstorm/configs-shared
   command:
     - 'sh'
     - '-ec'
     - |
       /bin/cp -aR /opt/stackstorm/packs/. /opt/stackstorm/packs-shared &&
-      /bin/cp -aR /opt/stackstorm/virtualenvs/. /opt/stackstorm/virtualenvs-shared
+      /bin/cp -aR /opt/stackstorm/virtualenvs/. /opt/stackstorm/virtualenvs-shared &&
+      /bin/cp -aR /opt/stackstorm/configs/. /opt/stackstorm/configs-shared
   {{- with .securityContext | default $.Values.st2actionrunner.securityContext | default $.Values.securityContext }}
   {{/* st2actionrunner is likely the most permissive so use that if defined. */}}
   securityContext: {{- toYaml . | nindent 8 }}

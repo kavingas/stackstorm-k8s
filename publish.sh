@@ -1,5 +1,7 @@
 #!/bin/bash
 
+VERSION=1.2.0
+
 # Load env vars from .env
 set -o allexport
 source .env
@@ -22,5 +24,5 @@ helm package .
 
 # Use curl with env vars
 curl -u"$ARTIFACTORY_USERNAME:$ARTIFACTORY_API_KEY" \
-  -T stackstorm-ha-1.1.0.tgz \
-  "https://artifactory-uw2.adobeitc.com/artifactory/helm-stackstorm-release/stackstorm-ha-1.1.0.tgz"
+  -T stackstorm-ha-$VERSION.tgz \
+  "https://artifactory-uw2.adobeitc.com/artifactory/helm-dx-stackstorm-release/stackstorm-ha-$VERSION.tgz"
