@@ -258,9 +258,6 @@ consolidate pack-configs-volumes definitions
   {{- end }}
 {{- end -}}
 {{- define "stackstorm-ha.pack-configs-volume-mount" -}}
-- name: st2-pack-configs-vol
-  mountPath: /opt/stackstorm/configs/
-  readOnly: false
   {{- if and .Values.st2.packs.volumes.enabled .Values.st2.packs.volumes.configs .Values.st2.packs.configs }}
 - name: st2-pack-configs-from-helm-vol
   mountPath: /opt/stackstorm/configs-helm/
@@ -281,7 +278,7 @@ For custom st2packs-Container reduce duplicity by defining it here once
   emptyDir: {}
 - name: st2-virtualenvs-vol
   emptyDir: {}
-- name: st2-pack-configs-vol
+- name: st2-custom-pack-configs-vol
   emptyDir: {}
   {{- end }}
 {{- end -}}
@@ -300,7 +297,7 @@ For custom st2packs-Container reduce duplicity by defining it here once
 - name: st2-virtualenvs-vol
   mountPath: /opt/stackstorm/virtualenvs
   readOnly: true
-- name: st2-pack-configs-vol
+- name: st2-custom-pack-configs-vol
   mountPath: /opt/stackstorm/configs
   readOnly: true
   {{- end }}
@@ -315,6 +312,9 @@ define this here as well to simplify comparison with packs-volume-mounts
   readOnly: false
 - name: st2-virtualenvs-vol
   mountPath: /opt/stackstorm/virtualenvs
+  readOnly: false
+- name: st2-custom-pack-configs-vol
+  mountPath: /opt/stackstorm/configs
   readOnly: false
   {{- end }}
 {{- end -}}
@@ -351,15 +351,15 @@ Merge packs and virtualenvs from st2 with those from st2packs images
     mountPath: /opt/stackstorm/packs-shared
   - name: st2-virtualenvs-vol
     mountPath: /opt/stackstorm/virtualenvs-shared
-  - name: st2-pack-configs-vol
-    mountPath: /opt/stackstorm/configs-shared
+  - name: st2-custom-pack-configs-vol
+    mountPath: /opt/stackstorm/custom-pack-configs-shared
   command:
     - 'sh'
     - '-ec'
     - |
       /bin/cp -aR /opt/stackstorm/packs/. /opt/stackstorm/packs-shared &&
       /bin/cp -aR /opt/stackstorm/virtualenvs/. /opt/stackstorm/virtualenvs-shared &&
-      /bin/cp -aR /opt/stackstorm/configs/. /opt/stackstorm/configs-shared
+      /bin/cp -aR /opt/stackstorm/configs/. /opt/stackstorm/custom-pack-configs-shared
   {{- with .securityContext | default $.Values.st2actionrunner.securityContext | default $.Values.securityContext }}
   {{/* st2actionrunner is likely the most permissive so use that if defined. */}}
   securityContext: {{- toYaml . | nindent 8 }}
@@ -376,12 +376,15 @@ Merge packs and virtualenvs from st2 with those from st2packs images
     mountPath: /opt/stackstorm/packs-shared
   - name: st2-virtualenvs-vol
     mountPath: /opt/stackstorm/virtualenvs-shared
+  - name: st2-custom-pack-configs-vol
+    mountPath: /opt/stackstorm/custom-pack-configs-shared
   command:
     - 'sh'
     - '-ec'
     - |
       /bin/cp -aR /opt/stackstorm/packs/. /opt/stackstorm/packs-shared &&
-      /bin/cp -aR /opt/stackstorm/virtualenvs/. /opt/stackstorm/virtualenvs-shared
+      /bin/cp -aR /opt/stackstorm/virtualenvs/. /opt/stackstorm/virtualenvs-shared &&
+      /bin/cp -aR /opt/stackstorm/configs/. /opt/stackstorm/custom-pack-configs-shared
   {{- with .Values.st2actionrunner.securityContext | default .Values.securityContext }}
   {{/* st2actionrunner is likely the most permissive so use that if defined. */}}
   securityContext: {{- toYaml . | nindent 8 }}
