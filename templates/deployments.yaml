@@ -55,6 +55,8 @@ spec:
         envFrom:
         - secretRef:
             name: {{ include "stackstorm-ha.secrets.st2Auth" . }}
+        - secretRef:
+            name: {{ include "stackstorm-ha.secrets.ldap-password" . }}
         volumeMounts:
         - name: htpasswd-vol
           mountPath: /tmp/st2
