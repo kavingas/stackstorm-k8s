@@ -169,6 +169,11 @@ Reduce duplication of the st2.*.conf volume details
   mountPath: /etc/st2/st2.secrets.conf
   subPath: st2.secrets.conf
 {{- end }}
+{{- if $.Values.st2.ldapPem }}
+- name: st2-ldap-pem-secrets-vol
+  mountPath: /etc/st2/ldap/ldap.pem
+  subPath: ldap.pem
+{{- end }}
 {{- end -}}
 {{- define "stackstorm-ha.st2-config-volume" -}}
 - name: st2-config-vol
@@ -178,6 +183,11 @@ Reduce duplication of the st2.*.conf volume details
 - name: st2-config-secrets-vol
   secret:
     secretName: {{ $.Values.st2.existingConfigSecret }}
+{{- end }}
+{{- if $.Values.st2.ldapPem }}
+- name: st2-ldap-pem-secrets-vol
+  secret:
+    secretName: {{ $.Values.st2.ldapPem }}
 {{- end }}
 {{- end -}}
 
