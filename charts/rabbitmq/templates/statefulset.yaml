@@ -113,7 +113,14 @@ spec:
               value: {{ .Values.clustering.addressType }}
             - name: RABBITMQ_FORCE_BOOT
               value: {{ ternary "yes" "no" .Values.clustering.forceBoot | quote }}
-            {{- if (eq "hostname" .Values.clustering.addressType) }}
+            {{- if (and .Values.clustering.nodeName .Values.clustering.k8sHostnameSuffix) }}
+            - name: RABBITMQ_NODE_NAME
+              value: "{{ .Values.clustering.nodeName }}"
+            - name: RABBITMQ_NODENAME
+              value: "{{ .Values.clustering.nodeName }}"
+            - name: K8S_HOSTNAME_SUFFIX
+              value: "{{ .Values.clustering.k8sHostnameSuffix }}"
+            {{- else if  (eq "hostname" .Values.clustering.addressType) }}
             - name: RABBITMQ_NODE_NAME
               value: "rabbit@$(MY_POD_NAME).$(K8S_SERVICE_NAME).$(MY_POD_NAMESPACE).svc.{{ .Values.clusterDomain }}"
             - name: K8S_HOSTNAME_SUFFIX
