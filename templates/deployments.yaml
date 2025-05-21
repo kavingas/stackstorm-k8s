@@ -79,9 +79,7 @@ spec:
           {{- include "stackstorm-ha.st2-entrypoint" $ | nindent 10 }}
           - /opt/stackstorm/st2/bin/st2auth
           {{- include "stackstorm-ha.st2-config-file-parameters" $ | nindent 10 }}
-        {{- if .Values.st2auth.env }}
         env: {{- include "stackstorm-ha.customEnv" .Values.st2auth | nindent 8 }}
-        {{- end }}
         envFrom:
         - configMapRef:
             name: {{ .Release.Name }}-st2-urls
@@ -113,10 +111,12 @@ spec:
         {{- end }}
         resources:
           {{- toYaml .Values.st2auth.resources | nindent 10 }}
+{{ include "fluent-bit.sidecar.container" . | indent 6 }}
     {{- if .Values.st2auth.serviceAccount.attach }}
       serviceAccountName: {{ template "stackstorm-ha.serviceAccountName" . }}
     {{- end }}
       volumes:
+{{ include "fluent-bit.sidecar.volumes" . | indent 8 }}
         {{- include "stackstorm-ha.st2-config-volume" . | nindent 8 }}
         - name: htpasswd-vol
           emptyDir:
@@ -194,6 +194,7 @@ spec:
       {{- end }}
       terminationGracePeriodSeconds: {{ .Values.st2api.terminationGracePeriodSeconds | default 30 }}
       containers:
+{{ include "fluent-bit.sidecar.container" . | indent 6 }}
       - name: st2api
         image: '{{ template "stackstorm-ha.imageRepository" . }}/st2api:{{ tpl (.Values.st2api.image.tag | default .Values.image.tag) . }}'
         imagePullPolicy: {{ .Values.image.pullPolicy }}
@@ -209,9 +210,7 @@ spec:
           {{- include "stackstorm-ha.st2-entrypoint" $ | nindent 10 }}
           - /opt/stackstorm/st2/bin/st2api
           {{- include "stackstorm-ha.st2-config-file-parameters" $ | nindent 10 }}
-        {{- if .Values.st2api.env }}
         env: {{- include "stackstorm-ha.customEnv" .Values.st2api | nindent 8 }}
-        {{- end }}
         envFrom:
         - configMapRef:
             name: {{ .Release.Name }}-st2-urls
@@ -256,6 +255,7 @@ spec:
       serviceAccountName: {{ template "stackstorm-ha.serviceAccountName" . }}
     {{- end }}
       volumes:
+{{ include "fluent-bit.sidecar.volumes" . | indent 8 }}
         {{- if ne "disable" (default "" .Values.st2.datastore_crypto_key) }}
         - name: st2-encryption-key-vol
           secret:
@@ -333,6 +333,7 @@ spec:
       {{- include "stackstorm-ha.init-containers-wait-for-mq" . | nindent 6 }}
       terminationGracePeriodSeconds: {{ .Values.st2stream.terminationGracePeriodSeconds | default 30 }}
       containers:
+{{ include "fluent-bit.sidecar.container" . | indent 6 }}
       - name: st2stream
         image: '{{ template "stackstorm-ha.imageRepository" . }}/st2stream:{{ tpl (.Values.st2stream.image.tag | default .Values.image.tag) . }}'
         imagePullPolicy: {{ .Values.image.pullPolicy }}
@@ -348,9 +349,7 @@ spec:
           {{- include "stackstorm-ha.st2-entrypoint" $ | nindent 10 }}
           - /opt/stackstorm/st2/bin/st2stream
           {{- include "stackstorm-ha.st2-config-file-parameters" $ | nindent 10 }}
-        {{- if .Values.st2stream.env }}
         env: {{- include "stackstorm-ha.customEnv" .Values.st2stream | nindent 8 }}
-        {{- end }}
         envFrom:
         - configMapRef:
             name: {{ .Release.Name }}-st2-urls
@@ -382,6 +381,7 @@ spec:
       serviceAccountName: {{ template "stackstorm-ha.serviceAccountName" . }}
     {{- end }}
       volumes:
+{{ include "fluent-bit.sidecar.volumes" . | indent 8 }}
         {{- include "stackstorm-ha.st2-config-volume" . | nindent 8 }}
         {{- range .Values.st2stream.extra_volumes }}
         - name: {{ required "Each volume must have a 'name' in st2stream.extra_volumes" .name }}
@@ -442,6 +442,7 @@ spec:
       {{- end }}
       terminationGracePeriodSeconds: {{ .Values.st2web.terminationGracePeriodSeconds | default 30 }}
       containers:
+{{ include "fluent-bit.sidecar.container" . | indent 6 }}
       - name: st2web
         image: '{{ template "stackstorm-ha.imageRepository" . }}/st2web:{{ tpl (.Values.st2web.image.tag | default .Values.image.tag) . }}'
         imagePullPolicy: {{ .Values.image.pullPolicy }}
@@ -468,9 +469,7 @@ spec:
 #            path: /api/
 #            port: 443
 #          initialDelaySeconds: 3
-        {{- if .Values.st2web.env }}
         env: {{- include "stackstorm-ha.customEnv" .Values.st2web | nindent 8 }}
-        {{- end }}
         envFrom:
         - configMapRef:
             name: {{ .Release.Name }}-st2-urls
@@ -512,7 +511,8 @@ spec:
     {{- if or .Values.st2web.config .Values.st2web.extra_volumes .Values.st2web.postStartScript }}
       volumes:
     {{- else }}
-      volumes: []
+      volumes:
+{{ include "fluent-bit.sidecar.volumes" . | indent 8 }}
     {{- end }}
         {{- range .Values.st2web.extra_volumes }}
         - name: {{ required "Each volume must have a 'name' in st2web.extra_volumes" .name }}
@@ -585,6 +585,7 @@ spec:
       {{- include "stackstorm-ha.init-containers-wait-for-db" . | nindent 6 }}
       {{- include "stackstorm-ha.init-containers-wait-for-mq" . | nindent 6 }}
       containers:
+{{ include "fluent-bit.sidecar.container" . | indent 6 }}
       - name: st2rulesengine
         image: '{{ template "stackstorm-ha.imageRepository" . }}/st2rulesengine:{{ tpl (.Values.st2rulesengine.image.tag | default .Values.image.tag) . }}'
         imagePullPolicy: {{ .Values.image.pullPolicy }}
@@ -598,9 +599,7 @@ spec:
           {{- include "stackstorm-ha.st2-entrypoint" $ | nindent 10 }}
           - /opt/stackstorm/st2/bin/st2rulesengine
           {{- include "stackstorm-ha.st2-config-file-parameters" $ | nindent 10 }}
-        {{- if .Values.st2rulesengine.env }}
         env: {{- include "stackstorm-ha.customEnv" .Values.st2rulesengine | nindent 8 }}
-        {{- end }}
         envFrom:
         - configMapRef:
             name: {{ .Release.Name }}-st2-urls
@@ -630,6 +629,7 @@ spec:
       serviceAccountName: {{ template "stackstorm-ha.serviceAccountName" . }}
     {{- end }}
       volumes:
+{{ include "fluent-bit.sidecar.volumes" . | indent 8 }}
         {{- include "stackstorm-ha.st2-config-volume" . | nindent 8 }}
         {{- if ne "disable" (default "" .Values.st2.datastore_crypto_key) }}
         - name: st2-encryption-key-vol
@@ -703,6 +703,7 @@ spec:
       {{- include "stackstorm-ha.init-containers-wait-for-db" . | nindent 6 }}
       {{- include "stackstorm-ha.init-containers-wait-for-mq" . | nindent 6 }}
       containers:
+{{ include "fluent-bit.sidecar.container" . | indent 6 }}
       - name: st2timersengine
         image: '{{ template "stackstorm-ha.imageRepository" . }}/st2timersengine:{{ tpl (.Values.st2timersengine.image.tag | default .Values.image.tag) . }}'
         imagePullPolicy: {{ .Values.image.pullPolicy }}
@@ -716,9 +717,7 @@ spec:
           {{- include "stackstorm-ha.st2-entrypoint" $ | nindent 10 }}
           - /opt/stackstorm/st2/bin/st2timersengine
           {{- include "stackstorm-ha.st2-config-file-parameters" $ | nindent 10 }}
-        {{- if .Values.st2timersengine.env }}
         env: {{- include "stackstorm-ha.customEnv" .Values.st2timersengine | nindent 8 }}
-        {{- end }}
         envFrom:
         - configMapRef:
             name: {{ .Release.Name }}-st2-urls
@@ -743,6 +742,7 @@ spec:
       serviceAccountName: {{ template "stackstorm-ha.serviceAccountName" . }}
     {{- end }}
       volumes:
+{{ include "fluent-bit.sidecar.volumes" . | indent 8 }}
         {{- include "stackstorm-ha.st2-config-volume" . | nindent 8 }}
         {{- range .Values.st2timersengine.extra_volumes }}
         - name: {{ required "Each volume must have a 'name' in st2timersengine.extra_volumes" .name }}
@@ -811,6 +811,7 @@ spec:
       {{- include "stackstorm-ha.init-containers-wait-for-db" . | nindent 6 }}
       {{- include "stackstorm-ha.init-containers-wait-for-mq" . | nindent 6 }}
       containers:
+{{ include "fluent-bit.sidecar.container" . | indent 6 }}
       - name: st2workflowengine
         image: '{{ template "stackstorm-ha.imageRepository" . }}/st2workflowengine:{{ tpl (.Values.st2workflowengine.image.tag | default .Values.image.tag) . }}'
         imagePullPolicy: {{ .Values.image.pullPolicy }}
@@ -824,9 +825,7 @@ spec:
           {{- include "stackstorm-ha.st2-entrypoint" $ | nindent 10 }}
           - /opt/stackstorm/st2/bin/st2workflowengine
           {{- include "stackstorm-ha.st2-config-file-parameters" $ | nindent 10 }}
-        {{- if .Values.st2workflowengine.env }}
         env: {{- include "stackstorm-ha.customEnv" .Values.st2workflowengine | nindent 8 }}
-        {{- end }}
         envFrom:
         - configMapRef:
             name: {{ .Release.Name }}-st2-urls
@@ -856,6 +855,7 @@ spec:
       serviceAccountName: {{ template "stackstorm-ha.serviceAccountName" . }}
     {{- end }}
       volumes:
+{{ include "fluent-bit.sidecar.volumes" . | indent 8 }}
         {{- include "stackstorm-ha.st2-config-volume" . | nindent 8 }}
         {{- if ne "disable" (default "" .Values.st2.datastore_crypto_key) }}
         - name: st2-encryption-key-vol
@@ -930,6 +930,7 @@ spec:
       {{- include "stackstorm-ha.init-containers-wait-for-db" . | nindent 6 }}
       {{- include "stackstorm-ha.init-containers-wait-for-mq" . | nindent 6 }}
       containers:
+{{ include "fluent-bit.sidecar.container" . | indent 6 }}
       - name: st2scheduler
         image: '{{ template "stackstorm-ha.imageRepository" . }}/st2scheduler:{{ tpl (.Values.st2scheduler.image.tag | default .Values.image.tag) . }}'
         imagePullPolicy: {{ .Values.image.pullPolicy }}
@@ -943,9 +944,7 @@ spec:
           {{- include "stackstorm-ha.st2-entrypoint" $ | nindent 10 }}
           - /opt/stackstorm/st2/bin/st2scheduler
           {{- include "stackstorm-ha.st2-config-file-parameters" $ | nindent 10 }}
-        {{- if .Values.st2scheduler.env }}
         env: {{- include "stackstorm-ha.customEnv" .Values.st2scheduler | nindent 8 }}
-        {{- end }}
         envFrom:
         - configMapRef:
             name: {{ .Release.Name }}-st2-urls
@@ -975,6 +974,7 @@ spec:
       serviceAccountName: {{ template "stackstorm-ha.serviceAccountName" . }}
     {{- end }}
       volumes:
+{{ include "fluent-bit.sidecar.volumes" . | indent 8 }}
         {{- if ne "disable" (default "" .Values.st2.datastore_crypto_key) }}
         - name: st2-encryption-key-vol
           secret:
@@ -1047,6 +1047,7 @@ spec:
       {{- include "stackstorm-ha.init-containers-wait-for-db" . | nindent 6 }}
       {{- include "stackstorm-ha.init-containers-wait-for-mq" . | nindent 6 }}
       containers:
+{{ include "fluent-bit.sidecar.container" . | indent 6 }}
       - name: st2notifier
         image: '{{ template "stackstorm-ha.imageRepository" . }}/st2notifier:{{ tpl (.Values.st2notifier.image.tag | default .Values.image.tag) . }}'
         imagePullPolicy: {{ .Values.image.pullPolicy }}
@@ -1060,9 +1061,7 @@ spec:
           {{- include "stackstorm-ha.st2-entrypoint" $ | nindent 10 }}
           - /opt/stackstorm/st2/bin/st2notifier
           {{- include "stackstorm-ha.st2-config-file-parameters" $ | nindent 10 }}
-        {{- if .Values.st2notifier.env }}
         env: {{- include "stackstorm-ha.customEnv" .Values.st2notifier | nindent 8 }}
-        {{- end }}
         envFrom:
         - configMapRef:
             name: {{ .Release.Name }}-st2-urls
@@ -1087,6 +1086,7 @@ spec:
       serviceAccountName: {{ template "stackstorm-ha.serviceAccountName" . }}
     {{- end }}
       volumes:
+{{ include "fluent-bit.sidecar.volumes" . | indent 8 }}
         {{- include "stackstorm-ha.st2-config-volume" . | nindent 8 }}
         {{- range .Values.st2notifier.extra_volumes }}
         - name: {{ required "Each volume must have a 'name' in st2notifier.extra_volumes" .name }}
@@ -1217,6 +1217,7 @@ spec:
         {{- include "stackstorm-ha.packs-initContainers" $ | nindent 6 }}
       {{- end }}
       containers:
+{{- include "fluent-bit.sidecar.container" $ | nindent 6 }}
       - name: {{ $name }}
         image: '{{ template "stackstorm-ha.imageRepository" $ }}/st2sensorcontainer:{{ tpl ($sensor.image.tag | default $.Values.image.tag) $ }}'
         imagePullPolicy: {{ $.Values.image.pullPolicy }}
@@ -1243,9 +1244,7 @@ spec:
           # injected by {{ $name }}-init-config
           - --config-file=/etc/st2/st2.sensorcontainer.conf
           {{- end }}
-        {{- if $sensor.env }}
         env: {{- include "stackstorm-ha.customEnv" $sensor | nindent 8 }}
-        {{- end }}
         envFrom:
         - configMapRef:
             name: {{ $.Release.Name }}-st2-urls
@@ -1286,6 +1285,7 @@ spec:
       serviceAccountName: {{ template "stackstorm-ha.serviceAccountName" $ }}
     {{- end }}
       volumes:
+{{- include "fluent-bit.sidecar.volumes" $ | nindent 8 }}
         {{- if ne "disable" (default "" $.Values.st2.datastore_crypto_key) }}
         - name: st2-encryption-key-vol
           secret:
@@ -1384,6 +1384,7 @@ spec:
       {{- end }}
       terminationGracePeriodSeconds: {{ .Values.st2actionrunner.terminationGracePeriodSeconds | default 300 }}
       containers:
+{{ include "fluent-bit.sidecar.container" . | indent 6 }}
       - name: st2actionrunner
         {{- with .Values.st2actionrunner }}
         image: '{{ .image.repository | default (include "stackstorm-ha.imageRepository" $) }}/{{ .image.name | default "st2actionrunner" }}:{{ tpl (.image.tag | default $.Values.image.tag) $ }}'
@@ -1399,9 +1400,7 @@ spec:
           {{- include "stackstorm-ha.st2-entrypoint" $ | nindent 10 }}
           - /opt/stackstorm/st2/bin/st2actionrunner
           {{- include "stackstorm-ha.st2-config-file-parameters" $ | nindent 10 }}
-        {{- if .Values.st2actionrunner.env }}
         env: {{- include "stackstorm-ha.customEnv" .Values.st2actionrunner | nindent 8 }}
-        {{- end }}
         envFrom:
         - configMapRef:
             name: {{ .Release.Name }}-st2-urls
@@ -1439,6 +1438,7 @@ spec:
       serviceAccountName: {{ template "stackstorm-ha.serviceAccountName" . }}
     {{- end }}
       volumes:
+{{ include "fluent-bit.sidecar.volumes" . | indent 8 }}
         {{- if ne "disable" (default "" .Values.st2.datastore_crypto_key) }}
         - name: st2-encryption-key-vol
           secret:
@@ -1521,6 +1521,7 @@ spec:
       {{- include "stackstorm-ha.init-containers-wait-for-db" . | nindent 6 }}
       {{- include "stackstorm-ha.init-containers-wait-for-mq" . | nindent 6 }}
       containers:
+{{ include "fluent-bit.sidecar.container" . | indent 6 }}
       - name: st2garbagecollector
         image: '{{ template "stackstorm-ha.imageRepository" . }}/st2garbagecollector:{{ tpl (.Values.st2garbagecollector.image.tag | default .Values.image.tag) . }}'
         imagePullPolicy: {{ .Values.image.pullPolicy }}
@@ -1534,9 +1535,7 @@ spec:
           {{- include "stackstorm-ha.st2-entrypoint" $ | nindent 10 }}
           - /opt/stackstorm/st2/bin/st2garbagecollector
           {{- include "stackstorm-ha.st2-config-file-parameters" $ | nindent 10 }}
-        {{- if .Values.st2garbagecollector.env }}
         env: {{- include "stackstorm-ha.customEnv" .Values.st2garbagecollector | nindent 8 }}
-        {{- end }}
         envFrom:
         - configMapRef:
             name: {{ .Release.Name }}-st2-urls
@@ -1561,6 +1560,7 @@ spec:
       serviceAccountName: {{ template "stackstorm-ha.serviceAccountName" . }}
     {{- end }}
       volumes:
+{{ include "fluent-bit.sidecar.volumes" . | indent 8 }}
         {{- include "stackstorm-ha.st2-config-volume" . | nindent 8 }}
         {{- range .Values.st2garbagecollector.extra_volumes }}
         - name: {{ required "Each volume must have a 'name' in st2garbagecollector.extra_volumes" .name }}
@@ -1666,6 +1666,7 @@ spec:
             {{- tpl .Values.st2client.st2clientConfig . | nindent 12 }}
             EOT
       containers:
+{{ include "fluent-bit.sidecar.container" . | indent 6 }}
       - name: st2client
         image: '{{ template "stackstorm-ha.imageRepository" . }}/st2actionrunner:{{ tpl (.Values.st2client.image.tag | default .Values.image.tag) . }}'
         imagePullPolicy: {{ .Values.image.pullPolicy }}
@@ -1724,6 +1725,7 @@ spec:
         resources:
           {{- toYaml .Values.st2client.resources | nindent 10 }}
       volumes:
+{{ include "fluent-bit.sidecar.volumes" . | indent 8 }}
         {{- if ne "disable" (default "" .Values.st2.datastore_crypto_key) }}
         - name: st2-encryption-key-vol
           secret:
@@ -1816,6 +1818,7 @@ spec:
       - name: {{ .Values.image.pullSecret }}
       {{- end }}
       containers:
+{{ include "fluent-bit.sidecar.container" . | indent 6 }}
       - name: st2chatops
         {{- with .Values.st2chatops }}
         image: '{{ .image.repository | default (include "stackstorm-ha.imageRepository" $) }}/{{ .image.name | default "st2chatops" }}:{{ tpl (.image.tag | default $.Values.image.tag) $ }}'
@@ -1863,6 +1866,7 @@ spec:
               command: ["/bin/bash", "/post-start.sh"]
         {{- end }}
       volumes:
+{{ include "fluent-bit.sidecar.volumes" . | indent 8 }}
       {{- if .Values.st2chatops.hubotScriptsVolume }}
         - name: st2-chatops-hubot-scripts-vol
           {{- toYaml .Values.st2chatops.hubotScriptsVolume | nindent 10 }}

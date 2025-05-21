@@ -438,6 +438,10 @@ For custom st2packs-pullSecrets reduce duplicity by defining them here once
 Create the custom env list for each deployment
 */}}
 {{- define "stackstorm-ha.customEnv" -}}
+- name: POD_UID
+  valueFrom:
+    fieldRef:
+      fieldPath: metadata.uid
   {{- range $env, $value := .env }}
 - name: {{ $env | quote }}
   value: {{ $value | quote }}
