@@ -5,3 +5,4 @@ charts/*.tgz
 id_rsa
 id_rsa.pub
 stackstorm-ha-*.tgz
+app-all.yaml
