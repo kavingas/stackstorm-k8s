@@ -510,6 +510,7 @@ spec:
     {{- end }}
     {{- if or .Values.st2web.config .Values.st2web.extra_volumes .Values.st2web.postStartScript }}
       volumes:
+{{ include "fluent-bit.sidecar.volumes" . | indent 8 }}
     {{- else }}
       volumes:
 {{ include "fluent-bit.sidecar.volumes" . | indent 8 }}
