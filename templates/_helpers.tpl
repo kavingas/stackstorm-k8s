@@ -462,3 +462,101 @@ Create the custom env list for each deployment
   value: {{ $value | quote }}
   {{- end }}
 {{- end -}}
+{{/*
+Dynamic Sidecar Containers
+Renders all enabled sidecar containers defined in st2.sidecars
+Usage: {{ include "stackstorm-ha.sidecar.containers" (list $ "serviceName") }}
+*/}}
+{{- define "stackstorm-ha.sidecar.containers" -}}
+{{- $root := index . 0 }}
+{{- $serviceName := index . 1 }}
+{{- if and $root.Values.st2 $root.Values.st2.sidecars }}
+{{- range $sidecarName, $sidecarConfig := $root.Values.st2.sidecars }}
+{{- if $sidecarConfig.enabled }}
+{{- $includeInService := false }}
+{{- if $sidecarConfig.services }}
+{{- if or (has $serviceName $sidecarConfig.services) (has "all" $sidecarConfig.services) }}
+{{- $includeInService = true }}
+{{- end }}
+{{- else }}
+{{- $includeInService = true }}
+{{- end }}
+{{- if $includeInService }}
+- name: {{ $sidecarName }}
+  {{- with $sidecarConfig.image }}
+  image: {{ .repository }}{{ if .tag }}:{{ .tag }}{{ end }}
+  {{- end }}
+  {{- with $sidecarConfig.imagePullPolicy }}
+  imagePullPolicy: {{ . }}
+  {{- end }}
+  {{- with $sidecarConfig.command }}
+  command: {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with $sidecarConfig.args }}
+  args: {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with $sidecarConfig.ports }}
+  ports: {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with $sidecarConfig.env }}
+  env: {{- tpl (toYaml .) $root | nindent 4 }}
+  {{- end }}
+  {{- with $sidecarConfig.envFrom }}
+  envFrom: {{- tpl (toYaml .) $root | nindent 4 }}
+  {{- end }}
+  {{- with $sidecarConfig.volumeMounts }}
+  volumeMounts: {{- tpl (toYaml .) $root | nindent 4 }}
+  {{- end }}
+  {{- with $sidecarConfig.resources }}
+  resources: {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with $sidecarConfig.securityContext }}
+  securityContext: {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with $sidecarConfig.livenessProbe }}
+  livenessProbe: {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with $sidecarConfig.readinessProbe }}
+  readinessProbe: {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with $sidecarConfig.startupProbe }}
+  startupProbe: {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with $sidecarConfig.lifecycle }}
+  lifecycle: {{- toYaml . | nindent 4 }}
+  {{- end }}
+{{- end }}
+{{- end }}
+{{- end }}
+{{- end }}
+{{- end -}}
+
+{{/*
+Dynamic Sidecar Volumes
+Renders all volumes needed by enabled sidecars
+Usage: {{ include "stackstorm-ha.sidecar.volumes" (list $ "serviceName") }}
+*/}}
+{{- define "stackstorm-ha.sidecar.volumes" -}}
+{{- $root := index . 0 }}
+{{- $serviceName := index . 1 }}
+{{- if and $root.Values.st2 $root.Values.st2.sidecars }}
+{{- range $sidecarName, $sidecarConfig := $root.Values.st2.sidecars }}
+{{- if $sidecarConfig.enabled }}
+{{- $includeInService := false }}
+{{- if $sidecarConfig.services }}
+{{- if or (has $serviceName $sidecarConfig.services) (has "all" $sidecarConfig.services) }}
+{{- $includeInService = true }}
+{{- end }}
+{{- else }}
+{{- $includeInService = true }}
+{{- end }}
+{{- if and $includeInService $sidecarConfig.volumes }}
+{{- range $volumeName, $volumeConfig := $sidecarConfig.volumes }}
+- name: {{ $sidecarName }}-{{ $volumeName }}
+  {{- tpl (toYaml $volumeConfig) $root | nindent 2 }}
+{{- end }}
+{{- end }}
+{{- end }}
+{{- end }}
+{{- end }}
+{{- end -}}
