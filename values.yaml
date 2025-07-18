@@ -1139,6 +1139,5 @@ dnsConfig: {}
   #- name: ndots
   #  value: "2"
   #- name: edns0
-observability:
-  fluentd:
-    enabled: false
+
+splunk: {}
