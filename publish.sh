@@ -1,6 +1,6 @@
 #!/bin/bash
 
-VERSION=1.3.4
+VERSION=1.3.15
 
 # Load env vars from .env
 set -o allexport
