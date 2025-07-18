@@ -27,6 +27,7 @@ app.kubernetes.io/version: {{ tpl $appVersion $root | quote }}
 helm.sh/chart: {{ $root.Chart.Name }}-{{ $root.Chart.Version }}
 app.kubernetes.io/managed-by: {{ $root.Release.Service }}
 use-default-egress-policy: "true"
+ethos.corp.adobe.com/inject-sidecar: "true"
 {{- end -}}
 
 {{/*
