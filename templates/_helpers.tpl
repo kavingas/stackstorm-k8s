@@ -26,10 +26,6 @@ app.kubernetes.io/part-of: stackstorm
 app.kubernetes.io/version: {{ tpl $appVersion $root | quote }}
 helm.sh/chart: {{ $root.Chart.Name }}-{{ $root.Chart.Version }}
 app.kubernetes.io/managed-by: {{ $root.Release.Service }}
-use-default-egress-policy: "true"
-{{- if and (list "st2actionrunner" "st2api" "st2auth" "st2client" "st2garbagecollector" "st2notifier" "st2rulesengine" "st2scheduler" "st2sensorcontainer" "st2stream" "st2timersengine" "st2web" "st2workflowengine" | has $name) $root.Values.splunk.index $root.Values.splunk.sourceType }}
-ethos.corp.adobe.com/inject-sidecar: "true"
-{{- end }}
 {{- end -}}
 
 {{/*

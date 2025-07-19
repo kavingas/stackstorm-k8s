@@ -26,6 +26,9 @@ spec:
   template:
     metadata:
       labels: {{- include "stackstorm-ha.labels" (list $ "st2auth") | nindent 8 }}
+      {{- if .Values.st2auth.podLabels }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.st2auth.podLabels "context" $) | nindent 8 }}
+      {{- end }}
       annotations:
         checksum/config: {{ include (print $.Template.BasePath "/configmaps_st2-conf.yaml") . | sha256sum }}
         {{- if not .Values.st2.existingAuthSecret }}
@@ -37,10 +40,8 @@ spec:
         {{- if .Values.st2auth.annotations }}
           {{- toYaml .Values.st2auth.annotations | nindent 8 }}
         {{- end }}
-        {{- if and .Values.splunk.index .Values.splunk.sourceType  }}
-        ethos.corp.adobe.com/sidecar-type: "fluent-bit"
-        ethos.corp.adobe.com/logging-index: "{{ .Values.splunk.index }}"
-        ethos.corp.adobe.com/logging-sourcetype: "{{ .Values.splunk.sourceType }}"
+        {{- if .Values.st2auth.podAnnotations }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.st2auth.podAnnotations "context" $) | nindent 8 }}
         {{- end }}
     spec:
       {{- if .Values.image.pullSecret }}
@@ -172,6 +173,9 @@ spec:
   template:
     metadata:
       labels: {{- include "stackstorm-ha.labels" (list $ "st2api") | nindent 8 }}
+      {{- if .Values.st2api.podLabels }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.st2api.podLabels "context" $) | nindent 8 }}
+      {{- end }}
       annotations:
         checksum/config: {{ include (print $.Template.BasePath "/configmaps_st2-conf.yaml") . | sha256sum }}
         {{- if and (ne "disable" (default "" .Values.st2.datastore_crypto_key)) (not .Values.st2.existingDatastoreSecret) }}
@@ -183,10 +187,8 @@ spec:
         {{- if .Values.st2api.annotations }}
           {{- toYaml .Values.st2api.annotations | nindent 8 }}
         {{- end }}
-        {{- if and .Values.splunk.index .Values.splunk.sourceType  }}
-        ethos.corp.adobe.com/sidecar-type: "fluent-bit"
-        ethos.corp.adobe.com/logging-index: "{{ .Values.splunk.index }}"
-        ethos.corp.adobe.com/logging-sourcetype: "{{ .Values.splunk.sourceType }}"
+        {{- if .Values.st2api.podAnnotations }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.st2api.podAnnotations "context" $) | nindent 8 }}
         {{- end }}
     spec:
       {{- if .Values.image.pullSecret }}
@@ -325,6 +327,9 @@ spec:
   template:
     metadata:
       labels: {{- include "stackstorm-ha.labels" (list $ "st2stream") | nindent 8 }}
+      {{- if .Values.st2stream.podLabels }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.st2stream.podLabels "context" $) | nindent 8 }}
+      {{- end }}
       annotations:
         checksum/config: {{ include (print $.Template.BasePath "/configmaps_st2-conf.yaml") . | sha256sum }}
         {{- if .Values.st2stream.postStartScript }}
@@ -333,10 +338,8 @@ spec:
         {{- if .Values.st2stream.annotations }}
           {{- toYaml .Values.st2stream.annotations | nindent 8 }}
         {{- end }}
-        {{- if and .Values.splunk.index .Values.splunk.sourceType  }}
-        ethos.corp.adobe.com/sidecar-type: "fluent-bit"
-        ethos.corp.adobe.com/logging-index: "{{ .Values.splunk.index }}"
-        ethos.corp.adobe.com/logging-sourcetype: "{{ .Values.splunk.sourceType }}"
+        {{- if .Values.st2stream.podAnnotations }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.st2stream.podAnnotations "context" $) | nindent 8 }}
         {{- end }}
     spec:
       {{- if .Values.image.pullSecret }}
@@ -442,6 +445,9 @@ spec:
   template:
     metadata:
       labels: {{- include "stackstorm-ha.labels" (list $ "st2web") | nindent 8 }}
+      {{- if .Values.st2web.podLabels }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.st2web.podLabels "context" $) | nindent 8 }}
+      {{- end }}
       annotations:
         checksum/config: {{ include (print $.Template.BasePath "/configmaps_st2web.yaml") . | sha256sum }}
         {{- if .Values.st2web.postStartScript }}
@@ -450,10 +456,8 @@ spec:
         {{- if .Values.st2web.annotations }}
           {{- toYaml .Values.st2web.annotations | nindent 8 }}
         {{- end }}
-        {{- if and .Values.splunk.index .Values.splunk.sourceType  }}
-        ethos.corp.adobe.com/sidecar-type: "fluent-bit"
-        ethos.corp.adobe.com/logging-index: "{{ .Values.splunk.index }}"
-        ethos.corp.adobe.com/logging-sourcetype: "{{ .Values.splunk.sourceType }}"
+        {{- if .Values.st2web.podAnnotations }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.st2web.podAnnotations "context" $) | nindent 8 }}
         {{- end }}
     spec:
       {{- if .Values.image.pullSecret }}
@@ -586,6 +590,9 @@ spec:
   template:
     metadata:
       labels: {{- include "stackstorm-ha.labels" (list $ "st2rulesengine") | nindent 8 }}
+      {{- if .Values.st2rulesengine.podLabels }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.st2rulesengine.podLabels "context" $) | nindent 8 }}
+      {{- end }}
       annotations:
         checksum/config: {{ include (print $.Template.BasePath "/configmaps_st2-conf.yaml") . | sha256sum }}
         {{- if and (ne "disable" (default "" .Values.st2.datastore_crypto_key)) (not .Values.st2.existingDatastoreSecret) }}
@@ -597,10 +604,8 @@ spec:
         {{- if .Values.st2rulesengine.annotations }}
           {{- toYaml .Values.st2rulesengine.annotations | nindent 8 }}
         {{- end }}
-        {{- if and .Values.splunk.index .Values.splunk.sourceType  }}
-        ethos.corp.adobe.com/sidecar-type: "fluent-bit"
-        ethos.corp.adobe.com/logging-index: "{{ .Values.splunk.index }}"
-        ethos.corp.adobe.com/logging-sourcetype: "{{ .Values.splunk.sourceType }}"
+        {{- if .Values.st2rulesengine.podAnnotations }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.st2rulesengine.podAnnotations "context" $) | nindent 8 }}
         {{- end }}
     spec:
       {{- if .Values.image.pullSecret }}
@@ -712,6 +717,9 @@ spec:
   template:
     metadata:
       labels: {{- include "stackstorm-ha.labels" (list $ "st2timersengine") | nindent 8 }}
+      {{- if .Values.st2timersengine.podLabels }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.st2timersengine.podLabels "context" $) | nindent 8 }}
+      {{- end }}
       annotations:
         checksum/config: {{ include (print $.Template.BasePath "/configmaps_st2-conf.yaml") . | sha256sum }}
         {{- if .Values.st2timersengine.postStartScript }}
@@ -720,10 +728,8 @@ spec:
         {{- if .Values.st2timersengine.annotations }}
           {{- toYaml .Values.st2timersengine.annotations | nindent 8 }}
         {{- end }}
-        {{- if and .Values.splunk.index .Values.splunk.sourceType  }}
-        ethos.corp.adobe.com/sidecar-type: "fluent-bit"
-        ethos.corp.adobe.com/logging-index: "{{ .Values.splunk.index }}"
-        ethos.corp.adobe.com/logging-sourcetype: "{{ .Values.splunk.sourceType }}"
+        {{- if .Values.st2timersengine.podAnnotations }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.st2timersengine.podAnnotations "context" $) | nindent 8 }}
         {{- end }}
     spec:
       {{- if .Values.image.pullSecret }}
@@ -821,6 +827,9 @@ spec:
   template:
     metadata:
       labels: {{- include "stackstorm-ha.labels" (list $ "st2workflowengine") | nindent 8 }}
+      {{- if .Values.st2workflowengine.podLabels }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.st2workflowengine.podLabels "context" $) | nindent 8 }}
+      {{- end }}
       annotations:
         checksum/config: {{ include (print $.Template.BasePath "/configmaps_st2-conf.yaml") . | sha256sum }}
         {{- if and (ne "disable" (default "" .Values.st2.datastore_crypto_key)) (not .Values.st2.existingDatastoreSecret) }}
@@ -832,10 +841,8 @@ spec:
         {{- if .Values.st2workflowengine.annotations }}
           {{- toYaml .Values.st2workflowengine.annotations | nindent 8 }}
         {{- end }}
-        {{- if and .Values.splunk.index .Values.splunk.sourceType  }}
-        ethos.corp.adobe.com/sidecar-type: "fluent-bit"
-        ethos.corp.adobe.com/logging-index: "{{ .Values.splunk.index }}"
-        ethos.corp.adobe.com/logging-sourcetype: "{{ .Values.splunk.sourceType }}"
+        {{- if .Values.st2workflowengine.podAnnotations }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.st2workflowengine.podAnnotations "context" $) | nindent 8 }}
         {{- end }}
     spec:
       terminationGracePeriodSeconds: {{ .Values.st2workflowengine.terminationGracePeriodSeconds | default 300 }}
@@ -946,6 +953,9 @@ spec:
   template:
     metadata:
       labels: {{- include "stackstorm-ha.labels" (list $ "st2scheduler") | nindent 8 }}
+      {{- if .Values.st2scheduler.podLabels }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.st2scheduler.podLabels "context" $) | nindent 8 }}
+      {{- end }}
       annotations:
         checksum/config: {{ include (print $.Template.BasePath "/configmaps_st2-conf.yaml") . | sha256sum }}
         {{- if and (ne "disable" (default "" .Values.st2.datastore_crypto_key)) (not .Values.st2.existingDatastoreSecret) }}
@@ -957,10 +967,8 @@ spec:
         {{- if .Values.st2scheduler.annotations }}
           {{- toYaml .Values.st2scheduler.annotations | nindent 8 }}
         {{- end }}
-        {{- if and .Values.splunk.index .Values.splunk.sourceType  }}
-        ethos.corp.adobe.com/sidecar-type: "fluent-bit"
-        ethos.corp.adobe.com/logging-index: "{{ .Values.splunk.index }}"
-        ethos.corp.adobe.com/logging-sourcetype: "{{ .Values.splunk.sourceType }}"
+        {{- if .Values.st2scheduler.podAnnotations }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.st2scheduler.podAnnotations "context" $) | nindent 8 }}
         {{- end }}
     spec:
       {{- if .Values.image.pullSecret }}
@@ -1071,6 +1079,9 @@ spec:
   template:
     metadata:
       labels: {{- include "stackstorm-ha.labels" (list $ "st2notifier") | nindent 8 }}
+      {{- if .Values.st2notifier.podLabels }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.st2notifier.podLabels "context" $) | nindent 8 }}
+      {{- end }}
       annotations:
         checksum/config: {{ include (print $.Template.BasePath "/configmaps_st2-conf.yaml") . | sha256sum }}
         {{- if .Values.st2notifier.postStartScript }}
@@ -1079,10 +1090,8 @@ spec:
         {{- if .Values.st2notifier.annotations }}
           {{- toYaml .Values.st2notifier.annotations | nindent 8 }}
         {{- end }}
-        {{- if and .Values.splunk.index .Values.splunk.sourceType  }}
-        ethos.corp.adobe.com/sidecar-type: "fluent-bit"
-        ethos.corp.adobe.com/logging-index: "{{ .Values.splunk.index }}"
-        ethos.corp.adobe.com/logging-sourcetype: "{{ .Values.splunk.sourceType }}"
+        {{- if .Values.st2notifier.podAnnotations }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.st2notifier.podAnnotations "context" $) | nindent 8 }}
         {{- end }}
     spec:
       {{- if .Values.image.pullSecret }}
@@ -1210,6 +1219,9 @@ spec:
   template:
     metadata:
       labels: {{- include "stackstorm-ha.labels" (list $ $name) | nindent 8 }}
+      {{- if $.Values.st2sensorcontainer.podLabels }}
+        {{- include "common.tplvalues.render" (dict "value" $.Values.st2sensorcontainer.podLabels "context" $) | nindent 8 }}
+      {{- end }}
       annotations:
         checksum/config: {{ include (print $.Template.BasePath "/configmaps_st2-conf.yaml") $ | sha256sum }}
         checksum/packs: {{ include (print $.Template.BasePath "/configmaps_packs.yaml") $ | sha256sum }}
@@ -1230,10 +1242,8 @@ spec:
         {{- if $sensor.annotations }}
           {{- toYaml $sensor.annotations | nindent 8 }}
         {{- end }}
-        {{- if and $.Values.splunk.index $.Values.splunk.sourceType  }}
-        ethos.corp.adobe.com/sidecar-type: "fluent-bit"
-        ethos.corp.adobe.com/logging-index: "{{ $.Values.splunk.index }}"
-        ethos.corp.adobe.com/logging-sourcetype: "{{ $.Values.splunk.sourceType }}"
+        {{- if $.Values.st2sensorcontainer.podAnnotations }}
+        {{- include "common.tplvalues.render" (dict "value" $.Values.st2sensorcontainer.podAnnotations "context" $) | nindent 8 }}
         {{- end }}
     spec:
       {{- if $.Values.image.pullSecret }}
@@ -1400,6 +1410,9 @@ spec:
   template:
     metadata:
       labels: {{- include "stackstorm-ha.labels" (list $ "st2actionrunner") | nindent 8 }}
+      {{- if .Values.st2actionrunner.podLabels }}
+      {{- include "common.tplvalues.render" (dict "value" .Values.st2actionrunner.podLabels "context" $) | nindent 8 }}
+      {{- end }}
       annotations:
         checksum/config: {{ include (print $.Template.BasePath "/configmaps_st2-conf.yaml") . | sha256sum }}
         checksum/ssh: {{ include (print $.Template.BasePath "/secrets_ssh.yaml") . | sha256sum }}
@@ -1412,10 +1425,8 @@ spec:
         {{- if .Values.st2actionrunner.annotations }}
           {{- toYaml .Values.st2actionrunner.annotations | nindent 8 }}
         {{- end }}
-        {{- if and .Values.splunk.index .Values.splunk.sourceType  }}
-        ethos.corp.adobe.com/sidecar-type: "fluent-bit"
-        ethos.corp.adobe.com/logging-index: "{{ .Values.splunk.index }}"
-        ethos.corp.adobe.com/logging-sourcetype: "{{ .Values.splunk.sourceType }}"
+        {{- if .Values.st2actionrunner.podAnnotations }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.st2actionrunner.podAnnotations "context" $) | nindent 8 }}
         {{- end }}
     spec:
       {{- if .Values.st2actionrunner.hostAliases }}
@@ -1560,6 +1571,9 @@ spec:
   template:
     metadata:
       labels: {{- include "stackstorm-ha.labels" (list $ "st2garbagecollector") | nindent 8 }}
+      {{- if .Values.st2garbagecollector.podLabels }}
+      {{- include "common.tplvalues.render" (dict "value" .Values.st2garbagecollector.podLabels "context" $) | nindent 8 }}
+      {{- end }}
       annotations:
         checksum/config: {{ include (print $.Template.BasePath "/configmaps_st2-conf.yaml") . | sha256sum }}
         {{- if .Values.st2garbagecollector.postStartScript }}
@@ -1568,10 +1582,8 @@ spec:
         {{- if .Values.st2garbagecollector.annotations }}
           {{- toYaml .Values.st2garbagecollector.annotations | nindent 8 }}
         {{- end }}
-        {{- if and .Values.splunk.index .Values.splunk.sourceType  }}
-        ethos.corp.adobe.com/sidecar-type: "fluent-bit"
-        ethos.corp.adobe.com/logging-index: "{{ .Values.splunk.index }}"
-        ethos.corp.adobe.com/logging-sourcetype: "{{ .Values.splunk.sourceType }}"
+        {{- if .Values.st2garbagecollector.podAnnotations }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.st2garbagecollector.podAnnotations "context" $) | nindent 8 }}
         {{- end }}
     spec:
       {{- if .Values.image.pullSecret }}
@@ -1667,6 +1679,9 @@ spec:
   template:
     metadata:
       labels: {{- include "stackstorm-ha.labels" (list $ "st2client") | nindent 8 }}
+      {{- if .Values.st2client.podLabels }}
+      {{- include "common.tplvalues.render" (dict "value" .Values.st2client.podLabels "context" $) | nindent 8 }}
+      {{- end }}
       annotations:
         checksum/config: {{ include (print $.Template.BasePath "/configmaps_st2-conf.yaml") . | sha256sum }}
         checksum/rbac: {{ include (print $.Template.BasePath "/configmaps_rbac.yaml") . | sha256sum }}
@@ -1687,10 +1702,8 @@ spec:
         {{- if .Values.st2client.annotations }}
           {{- toYaml .Values.st2client.annotations | nindent 8 }}
         {{- end }}
-        {{- if and .Values.splunk.index .Values.splunk.sourceType  }}
-        ethos.corp.adobe.com/sidecar-type: "fluent-bit"
-        ethos.corp.adobe.com/logging-index: "{{ .Values.splunk.index }}"
-        ethos.corp.adobe.com/logging-sourcetype: "{{ .Values.splunk.sourceType }}"
+        {{- if .Values.st2client.podAnnotations }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.st2client.podAnnotations "context" $) | nindent 8 }}
         {{- end }}
     spec:
       {{- if .Values.st2.packs.images }}
@@ -1870,6 +1883,9 @@ spec:
   template:
     metadata:
       labels: {{- include "stackstorm-ha.labels" (list $ "st2chatops") | nindent 8 }}
+      {{- if .Values.st2chatops.podLabels }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.st2chatops.podLabels "context" $) | nindent 8 }}
+      {{- end }}
       annotations:
         checksum/chatops: {{ include (print $.Template.BasePath "/secrets_st2chatops.yaml") . | sha256sum }}
         {{- if .Values.st2chatops.postStartScript }}
@@ -1878,10 +1894,8 @@ spec:
         {{- if .Values.st2chatops.annotations }}
           {{- toYaml .Values.st2chatops.annotations | nindent 8 }}
         {{- end }}
-        {{- if and .Values.splunk.index .Values.splunk.sourceType  }}
-        ethos.corp.adobe.com/sidecar-type: "fluent-bit"
-        ethos.corp.adobe.com/logging-index: "{{ .Values.splunk.index }}"
-        ethos.corp.adobe.com/logging-sourcetype: "{{ .Values.splunk.sourceType }}"
+        {{- if .Values.st2chatops.podAnnotations }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.st2chatops.podAnnotations "context" $) | nindent 8 }}
         {{- end }}
     spec:
       {{- if .Values.image.pullSecret }}
