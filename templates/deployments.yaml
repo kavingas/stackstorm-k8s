@@ -70,6 +70,9 @@ spec:
           - printf "${ST2_AUTH_USERNAME}:$(openssl passwd -apr1 "${ST2_AUTH_PASSWORD}")\n" > /tmp/st2/htpasswd
       terminationGracePeriodSeconds: {{ .Values.st2auth.terminationGracePeriodSeconds | default 30 }}
       containers:
+        {{- if .Values.st2auth.containers }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.st2auth.containers "context" $) | nindent 6 }}
+        {{- end }}
       - name: st2auth
         image: '{{ template "stackstorm-ha.imageRepository" . }}/st2auth:{{ tpl (.Values.st2auth.image.tag | default .Values.image.tag) . }}'
         imagePullPolicy: {{ .Values.image.pullPolicy }}
@@ -122,7 +125,9 @@ spec:
       serviceAccountName: {{ template "stackstorm-ha.serviceAccountName" . }}
     {{- end }}
       volumes:
-{{- include "stackstorm-ha.sidecar.volumes" (list $ "st2auth") | nindent 8 }}
+        {{- if .Values.st2auth.volumes }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.st2auth.volumes "context" $) | nindent 8 }}
+        {{- end }}
         {{- include "stackstorm-ha.st2-config-volume" . | nindent 8 }}
         - name: htpasswd-vol
           emptyDir:
@@ -206,7 +211,9 @@ spec:
       {{- end }}
       terminationGracePeriodSeconds: {{ .Values.st2api.terminationGracePeriodSeconds | default 30 }}
       containers:
-{{- include "stackstorm-ha.sidecar.containers" (list $ "st2api") | nindent 6 }}
+        {{- if .Values.st2api.containers }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.st2api.containers "context" $) | nindent 6 }}
+        {{- end }}
       - name: st2api
         image: '{{ template "stackstorm-ha.imageRepository" . }}/st2api:{{ tpl (.Values.st2api.image.tag | default .Values.image.tag) . }}'
         imagePullPolicy: {{ .Values.image.pullPolicy }}
@@ -267,7 +274,9 @@ spec:
       serviceAccountName: {{ template "stackstorm-ha.serviceAccountName" . }}
     {{- end }}
       volumes:
-{{- include "stackstorm-ha.sidecar.volumes" (list $ "st2api") | nindent 8 }}
+        {{- if .Values.st2api.volumes }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.st2api.volumes "context" $) | nindent 8 }}
+        {{- end }}
         {{- if ne "disable" (default "" .Values.st2.datastore_crypto_key) }}
         - name: st2-encryption-key-vol
           secret:
@@ -351,7 +360,9 @@ spec:
       {{- include "stackstorm-ha.init-containers-wait-for-mq" . | nindent 6 }}
       terminationGracePeriodSeconds: {{ .Values.st2stream.terminationGracePeriodSeconds | default 30 }}
       containers:
-{{- include "stackstorm-ha.sidecar.containers" (list $ "st2stream") | nindent 6 }}
+        {{- if .Values.st2stream.containers }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.st2stream.containers "context" $) | nindent 6 }}
+        {{- end }}
       - name: st2stream
         image: '{{ template "stackstorm-ha.imageRepository" . }}/st2stream:{{ tpl (.Values.st2stream.image.tag | default .Values.image.tag) . }}'
         imagePullPolicy: {{ .Values.image.pullPolicy }}
@@ -399,7 +410,9 @@ spec:
       serviceAccountName: {{ template "stackstorm-ha.serviceAccountName" . }}
     {{- end }}
       volumes:
-{{- include "stackstorm-ha.sidecar.volumes" (list $ "st2stream") | nindent 8 }}
+        {{- if .Values.st2stream.volumes }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.st2stream.volumes "context" $) | nindent 8 }}
+        {{- end }}
         {{- include "stackstorm-ha.st2-config-volume" . | nindent 8 }}
         {{- range .Values.st2stream.extra_volumes }}
         - name: {{ required "Each volume must have a 'name' in st2stream.extra_volumes" .name }}
@@ -466,7 +479,9 @@ spec:
       {{- end }}
       terminationGracePeriodSeconds: {{ .Values.st2web.terminationGracePeriodSeconds | default 30 }}
       containers:
-{{- include "stackstorm-ha.sidecar.containers" (list $ "st2web") | nindent 6 }}
+        {{- if .Values.st2web.containers }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.st2web.containers "context" $) | nindent 6 }}
+        {{- end }}
       - name: st2web
         image: '{{ template "stackstorm-ha.imageRepository" . }}/st2web:{{ tpl (.Values.st2web.image.tag | default .Values.image.tag) . }}'
         imagePullPolicy: {{ .Values.image.pullPolicy }}
@@ -534,10 +549,14 @@ spec:
     {{- end }}
     {{- if or .Values.st2web.config .Values.st2web.extra_volumes .Values.st2web.postStartScript }}
       volumes:
-{{- include "stackstorm-ha.sidecar.volumes" (list $ "st2web") | nindent 8 }}
+        {{- if .Values.st2web.volumes }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.st2web.volumes "context" $) | nindent 8 }}
+        {{- end }}
     {{- else }}
       volumes:
-{{- include "stackstorm-ha.sidecar.volumes" (list $ "st2web") | nindent 8 }}
+        {{- if .Values.st2web.volumes }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.st2web.volumes "context" $) | nindent 8 }}
+        {{- end }}
     {{- end }}
         {{- range .Values.st2web.extra_volumes }}
         - name: {{ required "Each volume must have a 'name' in st2web.extra_volumes" .name }}
@@ -616,7 +635,9 @@ spec:
       {{- include "stackstorm-ha.init-containers-wait-for-db" . | nindent 6 }}
       {{- include "stackstorm-ha.init-containers-wait-for-mq" . | nindent 6 }}
       containers:
-{{- include "stackstorm-ha.sidecar.containers" (list $ "st2rulesengine") | nindent 6 }}
+        {{- if .Values.st2rulesengine.containers }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.st2rulesengine.containers "context" $) | nindent 6 }}
+        {{- end }}
       - name: st2rulesengine
         image: '{{ template "stackstorm-ha.imageRepository" . }}/st2rulesengine:{{ tpl (.Values.st2rulesengine.image.tag | default .Values.image.tag) . }}'
         imagePullPolicy: {{ .Values.image.pullPolicy }}
@@ -660,7 +681,9 @@ spec:
       serviceAccountName: {{ template "stackstorm-ha.serviceAccountName" . }}
     {{- end }}
       volumes:
-{{- include "stackstorm-ha.sidecar.volumes" (list $ "st2rulesengine") | nindent 8 }}
+        {{- if .Values.st2rulesengine.volumes }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.st2rulesengine.volumes "context" $) | nindent 8 }}
+        {{- end }}
         {{- include "stackstorm-ha.st2-config-volume" . | nindent 8 }}
         {{- if ne "disable" (default "" .Values.st2.datastore_crypto_key) }}
         - name: st2-encryption-key-vol
@@ -740,7 +763,9 @@ spec:
       {{- include "stackstorm-ha.init-containers-wait-for-db" . | nindent 6 }}
       {{- include "stackstorm-ha.init-containers-wait-for-mq" . | nindent 6 }}
       containers:
-{{- include "stackstorm-ha.sidecar.containers" (list $ "st2timersengine") | nindent 6 }}
+        {{- if .Values.st2timersengine.containers }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.st2timersengine.containers "context" $) | nindent 6 }}
+        {{- end }}
       - name: st2timersengine
         image: '{{ template "stackstorm-ha.imageRepository" . }}/st2timersengine:{{ tpl (.Values.st2timersengine.image.tag | default .Values.image.tag) . }}'
         imagePullPolicy: {{ .Values.image.pullPolicy }}
@@ -779,7 +804,9 @@ spec:
       serviceAccountName: {{ template "stackstorm-ha.serviceAccountName" . }}
     {{- end }}
       volumes:
-{{- include "stackstorm-ha.sidecar.volumes" (list $ "st2timersengine") | nindent 8 }}
+        {{- if .Values.st2timersengine.volumes }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.st2timersengine.volumes "context" $) | nindent 8 }}
+        {{- end }}
         {{- include "stackstorm-ha.st2-config-volume" . | nindent 8 }}
         {{- range .Values.st2timersengine.extra_volumes }}
         - name: {{ required "Each volume must have a 'name' in st2timersengine.extra_volumes" .name }}
@@ -854,7 +881,9 @@ spec:
       {{- include "stackstorm-ha.init-containers-wait-for-db" . | nindent 6 }}
       {{- include "stackstorm-ha.init-containers-wait-for-mq" . | nindent 6 }}
       containers:
-{{- include "stackstorm-ha.sidecar.containers" (list $ "st2workflowengine") | nindent 6 }}
+        {{- if .Values.st2workflowengine.containers }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.st2workflowengine.containers "context" $) | nindent 6 }}
+        {{- end }}
       - name: st2workflowengine
         image: '{{ template "stackstorm-ha.imageRepository" . }}/st2workflowengine:{{ tpl (.Values.st2workflowengine.image.tag | default .Values.image.tag) . }}'
         imagePullPolicy: {{ .Values.image.pullPolicy }}
@@ -898,7 +927,9 @@ spec:
       serviceAccountName: {{ template "stackstorm-ha.serviceAccountName" . }}
     {{- end }}
       volumes:
-{{- include "stackstorm-ha.sidecar.volumes" (list $ "st2workflowengine") | nindent 8 }}
+        {{- if .Values.st2workflowengine.volumes }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.st2workflowengine.volumes "context" $) | nindent 8 }}
+        {{- end }}
         {{- include "stackstorm-ha.st2-config-volume" . | nindent 8 }}
         {{- if ne "disable" (default "" .Values.st2.datastore_crypto_key) }}
         - name: st2-encryption-key-vol
@@ -979,7 +1010,9 @@ spec:
       {{- include "stackstorm-ha.init-containers-wait-for-db" . | nindent 6 }}
       {{- include "stackstorm-ha.init-containers-wait-for-mq" . | nindent 6 }}
       containers:
-{{- include "stackstorm-ha.sidecar.containers" (list $ "st2scheduler") | nindent 6 }}
+        {{- if .Values.st2scheduler.containers }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.st2scheduler.containers "context" $) | nindent 6 }}
+        {{- end }}
       - name: st2scheduler
         image: '{{ template "stackstorm-ha.imageRepository" . }}/st2scheduler:{{ tpl (.Values.st2scheduler.image.tag | default .Values.image.tag) . }}'
         imagePullPolicy: {{ .Values.image.pullPolicy }}
@@ -1023,7 +1056,9 @@ spec:
       serviceAccountName: {{ template "stackstorm-ha.serviceAccountName" . }}
     {{- end }}
       volumes:
-{{- include "stackstorm-ha.sidecar.volumes" (list $ "st2scheduler") | nindent 8 }}
+        {{- if .Values.st2scheduler.volumes }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.st2scheduler.volumes "context" $) | nindent 8 }}
+        {{- end }}
         {{- if ne "disable" (default "" .Values.st2.datastore_crypto_key) }}
         - name: st2-encryption-key-vol
           secret:
@@ -1102,7 +1137,9 @@ spec:
       {{- include "stackstorm-ha.init-containers-wait-for-db" . | nindent 6 }}
       {{- include "stackstorm-ha.init-containers-wait-for-mq" . | nindent 6 }}
       containers:
-{{- include "stackstorm-ha.sidecar.containers" (list $ "st2notifier") | nindent 6 }}
+        {{- if .Values.st2notifier.containers }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.st2notifier.containers "context" $) | nindent 6 }}
+        {{- end }}
       - name: st2notifier
         image: '{{ template "stackstorm-ha.imageRepository" . }}/st2notifier:{{ tpl (.Values.st2notifier.image.tag | default .Values.image.tag) . }}'
         imagePullPolicy: {{ .Values.image.pullPolicy }}
@@ -1141,7 +1178,9 @@ spec:
       serviceAccountName: {{ template "stackstorm-ha.serviceAccountName" . }}
     {{- end }}
       volumes:
-{{- include "stackstorm-ha.sidecar.volumes" (list $ "st2notifier") | nindent 8 }}
+        {{- if .Values.st2notifier.volumes }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.st2notifier.volumes "context" $) | nindent 8 }}
+        {{- end }}
         {{- include "stackstorm-ha.st2-config-volume" . | nindent 8 }}
         {{- range .Values.st2notifier.extra_volumes }}
         - name: {{ required "Each volume must have a 'name' in st2notifier.extra_volumes" .name }}
@@ -1278,7 +1317,9 @@ spec:
         {{- include "stackstorm-ha.packs-initContainers" $ | nindent 6 }}
       {{- end }}
       containers:
-{{- include "stackstorm-ha.sidecar.containers" (list $ "st2sensorcontainer") | nindent 6 }}
+        {{- if $.Values.st2sensorcontainer.containers }}
+        {{- include "common.tplvalues.render" (dict "value" $.Values.st2sensorcontainer.containers "context" $) | nindent 6 }}
+        {{- end }}
       - name: {{ $name }}
         image: '{{ template "stackstorm-ha.imageRepository" $ }}/st2sensorcontainer:{{ tpl ($sensor.image.tag | default $.Values.image.tag) $ }}'
         imagePullPolicy: {{ $.Values.image.pullPolicy }}
@@ -1346,7 +1387,9 @@ spec:
       serviceAccountName: {{ template "stackstorm-ha.serviceAccountName" $ }}
     {{- end }}
       volumes:
-{{- include "stackstorm-ha.sidecar.volumes" (list $ "st2sensorcontainer") | nindent 8 }}
+        {{- if $.Values.st2sensorcontainer.volumes }}
+        {{- include "common.tplvalues.render" (dict "value" $.Values.st2sensorcontainer.volumes "context" $) | nindent 8 }}
+        {{- end }}
         {{- if ne "disable" (default "" $.Values.st2.datastore_crypto_key) }}
         - name: st2-encryption-key-vol
           secret:
@@ -1451,7 +1494,9 @@ spec:
       {{- end }}
       terminationGracePeriodSeconds: {{ .Values.st2actionrunner.terminationGracePeriodSeconds | default 300 }}
       containers:
-{{- include "stackstorm-ha.sidecar.containers" (list $ "st2actionrunner") | nindent 6 }}
+        {{- if .Values.st2actionrunner.containers }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.st2actionrunner.containers "context" $) | nindent 6 }}
+        {{- end }}
       - name: st2actionrunner
         {{- with .Values.st2actionrunner }}
         image: '{{ .image.repository | default (include "stackstorm-ha.imageRepository" $) }}/{{ .image.name | default "st2actionrunner" }}:{{ tpl (.image.tag | default $.Values.image.tag) $ }}'
@@ -1505,7 +1550,9 @@ spec:
       serviceAccountName: {{ template "stackstorm-ha.serviceAccountName" . }}
     {{- end }}
       volumes:
-{{- include "stackstorm-ha.sidecar.volumes" (list $ "st2actionrunner") | nindent 8 }}
+        {{- if .Values.st2actionrunner.volumes }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.st2actionrunner.volumes "context" $) | nindent 8 }}
+        {{- end }}
         {{- if ne "disable" (default "" .Values.st2.datastore_crypto_key) }}
         - name: st2-encryption-key-vol
           secret:
@@ -1594,7 +1641,9 @@ spec:
       {{- include "stackstorm-ha.init-containers-wait-for-db" . | nindent 6 }}
       {{- include "stackstorm-ha.init-containers-wait-for-mq" . | nindent 6 }}
       containers:
-{{- include "stackstorm-ha.sidecar.containers" (list $ "st2garbagecollector") | nindent 6 }}
+        {{- if .Values.st2garbagecollector.containers }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.st2garbagecollector.containers "context" $) | nindent 6 }}
+        {{- end }}
       - name: st2garbagecollector
         image: '{{ template "stackstorm-ha.imageRepository" . }}/st2garbagecollector:{{ tpl (.Values.st2garbagecollector.image.tag | default .Values.image.tag) . }}'
         imagePullPolicy: {{ .Values.image.pullPolicy }}
@@ -1633,7 +1682,9 @@ spec:
       serviceAccountName: {{ template "stackstorm-ha.serviceAccountName" . }}
     {{- end }}
       volumes:
-{{- include "stackstorm-ha.sidecar.volumes" (list $ "st2garbagecollector") | nindent 8 }}
+        {{- if .Values.st2garbagecollector.volumes }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.st2garbagecollector.volumes "context" $) | nindent 8 }}
+        {{- end }}
         {{- include "stackstorm-ha.st2-config-volume" . | nindent 8 }}
         {{- range .Values.st2garbagecollector.extra_volumes }}
         - name: {{ required "Each volume must have a 'name' in st2garbagecollector.extra_volumes" .name }}
@@ -1745,7 +1796,9 @@ spec:
             {{- tpl .Values.st2client.st2clientConfig . | nindent 12 }}
             EOT
       containers:
-{{- include "stackstorm-ha.sidecar.containers" (list $ "st2client") | nindent 6 }}
+        {{- if .Values.st2client.containers }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.st2client.containers "context" $) | nindent 6 }}
+        {{- end }}
       - name: st2client
         image: '{{ template "stackstorm-ha.imageRepository" . }}/st2actionrunner:{{ tpl (.Values.st2client.image.tag | default .Values.image.tag) . }}'
         imagePullPolicy: {{ .Values.image.pullPolicy }}
@@ -1804,7 +1857,9 @@ spec:
         resources:
           {{- toYaml .Values.st2client.resources | nindent 10 }}
       volumes:
-{{- include "stackstorm-ha.sidecar.volumes" (list $ "st2client") | nindent 8 }}
+        {{- if .Values.st2client.volumes }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.st2client.volumes "context" $) | nindent 8 }}
+        {{- end }}
         {{- if ne "disable" (default "" .Values.st2.datastore_crypto_key) }}
         - name: st2-encryption-key-vol
           secret:
@@ -1903,7 +1958,9 @@ spec:
       - name: {{ .Values.image.pullSecret }}
       {{- end }}
       containers:
-{{- include "stackstorm-ha.sidecar.containers" (list $ "st2chatops") | nindent 6 }}
+        {{- if .Values.st2chatops.containers }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.st2chatops.containers "context" $) | nindent 6 }}
+        {{- end }}
       - name: st2chatops
         {{- with .Values.st2chatops }}
         image: '{{ .image.repository | default (include "stackstorm-ha.imageRepository" $) }}/{{ .image.name | default "st2chatops" }}:{{ tpl (.image.tag | default $.Values.image.tag) $ }}'
@@ -1951,7 +2008,9 @@ spec:
               command: ["/bin/bash", "/post-start.sh"]
         {{- end }}
       volumes:
-{{- include "stackstorm-ha.sidecar.volumes" (list $ "st2chatops") | nindent 8 }}
+        {{- if .Values.st2chatops.volumes }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.st2chatops.volumes "context" $) | nindent 8 }}
+        {{- end }}
       {{- if .Values.st2chatops.hubotScriptsVolume }}
         - name: st2-chatops-hubot-scripts-vol
           {{- toYaml .Values.st2chatops.hubotScriptsVolume | nindent 10 }}
