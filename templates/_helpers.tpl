@@ -314,7 +314,7 @@ For custom st2packs-Container reduce duplicity by defining it here once
   readOnly: true
 - name: st2-custom-pack-overrides-vol
   mountPath: /opt/stackstorm/overrides
-  readOnly: true
+  readOnly: false
   {{- end }}
 {{- end -}}
 {{/*
